@@ -1,14 +1,17 @@
 import {
     createStore,
-    applyMiddleware
+    applyMiddleware,
+    combineReducers
 } from 'redux'
 
+import logger from 'redux-logger'
 import thunk from 'redux-thunk'
 
 //Actions
 const SAVE_INSPECTION_RESULT_STARTED='SAVE_INSPECTION_RESULT_STARTED'
 const SAVE_INSPECTION_RESULT_SUCCESS='SAVE_INSPECTION_RESULT_SUCCESS'
 const SAVE_INSPECTION_RESULT_FAIL='SAVE_INSPECTION_RESULT_FAIL'
+const ADD_INSPECTION_ITEM='ADD_INSPECTION_ITEM'
 
 //Action creators
 export const saveInspectionResultStarted=()=>{
@@ -28,6 +31,13 @@ export const saveInspectionResultFail=(error)=>{
     return {
         type:SAVE_INSPECTION_RESULT_FAIL,
         error
+    }
+}
+
+export const addInspectionItem=(inspectionItem)=>{
+    return {
+        type:ADD_INSPECTION_ITEM,
+        inspectionItem
     }
 }
 
@@ -75,5 +85,19 @@ var inspections=(state={},action)=>{
     }
 }
 
+var inspectionItems=(state=[],action)=>{
+    switch(action.type){
+        case ADD_INSPECTION_ITEM:
+            return [
+                ...state.filter((item)=>{
+                    return item.index!=action.inspectionItem.index
+                }),
+                action.inspectionItem
+            ]
+        default:
+            return state;
+    }
+}
+
 //Store
-export const store=createStore(inspections,applyMiddleware(thunk))
+export const store=createStore(combineReducers({inspections,inspectionItems}),applyMiddleware(thunk,logger))

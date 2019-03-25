@@ -7,18 +7,25 @@ import {
 
 import { Form, Item, Input,Content,Textarea,Picker,Icon } from 'native-base';
 import InspectionItem from './InspectionItem'
+import { store, addInspectionItem } from '../redux_inspection';
 
 class InspectionResult extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
-            inspectionItemTypes: [],
+            inspectionItemTypes: props.inspectionItemTypes,
             ancillaryType:'',
             inspectionItems:[],
             comments:'',
             additionalWorks:''
         }
+    }
+
+    componentWillReceiveProps(newProps){
+        this.setState({
+            inspectionItemTypes:newProps.inspectionItemTypes
+        })
     }
 
     onChange=(fieldName,fieldValue)=>{
@@ -43,6 +50,8 @@ class InspectionResult extends Component {
                 item
             ]
         },()=>{
+            store.dispatch(addInspectionItem(item));
+
             this.props.onInspectionResultChange({
                 ancillaryType:this.state.ancillaryType,
                 inspectionItems:this.state.inspectionItems,
@@ -54,23 +63,11 @@ class InspectionResult extends Component {
 
     _keyExtractor = (item) => item.id;
 
-    _renderItem = ({ item }) => {
-        return (<InspectionItem item={item} onInspectionItemChange={this.onInspectionItemChange} />)
+    _renderItem = ({ item, index }) => {
+        return (<InspectionItem item={item} index={index} onInspectionItemChange={this.onInspectionItemChange} />)
     }
 
-    componentDidMount(){
-        console.log("didMount")
-        fetch('http://www.mocky.io/v2/5b97533d30000070000bd533')
-        .then((response)=>response.json())
-        .then((result)=>{
-            this.setState({
-                inspectionItemTypes:result.data
-            })
-        })
-        .catch((err)=>{
-            Alert.alert("Error to load inspection items. Please try again later")
-        })
-    }
+    
 
     render() {
         return (

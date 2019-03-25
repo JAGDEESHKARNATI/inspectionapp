@@ -9,8 +9,6 @@ import {
   saveInspection
 } from './redux_inspection'
 
-
-
 class App extends React.Component {
     static navigationOptions = {
         drawerLabel: 'Inspection Result'
@@ -20,8 +18,24 @@ class App extends React.Component {
         super();
 
         this.state = {
-            inspectionResult: {}
+            inspectionItemTypes:[],
+            inspectionResult: {},
+            nextDisabled:true
         }
+    }
+
+    componentDidMount(){
+        console.log("didMount")
+        fetch('http://www.mocky.io/v2/5b97533d30000070000bd533')
+        .then((response)=>response.json())
+        .then((result)=>{
+            this.setState({
+                inspectionItemTypes:result.data
+            })
+        })
+        .catch((err)=>{
+            Alert.alert("Error to load inspection items. Please try again later")
+        })
     }
 
     onNext = async () => {
@@ -32,16 +46,30 @@ class App extends React.Component {
 
     onInspectionResultChange = (inspectionResult) => {
         //console.log(JSON.stringify(inspectionResult))
-        this.setState({
-            inspectionResult
-        })
+        var lastItem=inspectionResult.inspectionItems[this.state.inspectionItemTypes.length-1]
+
+        if((inspectionResult.inspectionItems.length==this.state.inspectionItemTypes.length) 
+        && (lastItem.inspectionResult != "" && lastItem.fixedOnSite != "" && lastItem.postInspectionWorkReq != "" && lastItem.workOrderNumber != "")){
+            this.setState({
+                inspectionResult,
+                nextDisabled:false
+            })
+        }
+        else
+        {
+            this.setState({
+                inspectionResult,
+                nextDisabled:true
+            })
+        }
+        
     }
 
     render() {
         return (
             <Container>
-                <AppHeader title="Inspection Result" onNext={this.onNext} />
-                <InspectionResult onInspectionResultChange={this.onInspectionResultChange}/>
+                <AppHeader title="Inspection Result" onNext={this.onNext} nextDisabled={this.state.nextDisabled} inspectionItemTypes={this.state.inspectionItemTypes}/>
+                <InspectionResult onInspectionResultChange={this.onInspectionResultChange} inspectionItemTypes={this.state.inspectionItemTypes}/>
             </Container>
         );
     }

@@ -12,7 +12,7 @@ class AppHeader extends Component {
                         <Title>{this.props.title}</Title>
                     </Body>
                     <Right>
-                        <Button onPress={() => this.props.onNext()} transparent>
+                        <Button onPress={() => this.props.onNext()} transparent disabled={this.props.nextDisabled}>
                             <Text>Next</Text>
                         </Button>
                     </Right>

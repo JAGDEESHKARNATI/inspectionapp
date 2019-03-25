@@ -12,6 +12,7 @@
     "react-native": "0.59.1",
     "react-native-paper": "^2.13.0",
     "redux": "^4.0.1",
+    "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
